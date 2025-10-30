@@ -1,0 +1,39 @@
+# Node modules
+node_modules/
+
+# dotenv environment files
+.env
+.env.local
+.env.*.local
+
+# macOS
+.DS_Store
+
+# npm/yarn logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Coverage
+coverage/
+
+# Parcel, Vite, etc.
+.parcel-cache/
+.vite/
+
+# Editor directories
+.vscode/
+.idea/
+
+# Vercel
+.vercel/
+
+# Misc
+.cache/
+.nyc_output/
