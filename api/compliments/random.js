@@ -5,7 +5,16 @@ let isConnected = false;
 // MongoDB connection
 async function connectDB() {
   if (isConnected) return;
-  await mongoose.connect(process.env.MONGO_URI);
+
+  const uri = process.env.MONGO_URI;
+  if (!uri) {
+    throw new Error("MONGO_URI not configured");
+  }
+
+  // Connect with a short timeout for serverless environments
+  await mongoose.connect(uri, {
+    serverSelectionTimeoutMS: 5000
+  });
   isConnected = true;
 }
 // Mongoose model
@@ -15,6 +24,12 @@ const Compliment = mongoose.models.Compliment || mongoose.model("Compliment", co
 // API handler
 export default async function handler(req, res) {
   try {
+    // Validate env early so deployed function returns an actionable message
+    if (!process.env.MONGO_URI) {
+      console.error("MONGO_URI environment variable is not set.");
+      return res.status(500).json({ error: "MONGO_URI not configured on server" });
+    }
+
     await connectDB();
 
     const count = await Compliment.countDocuments();
