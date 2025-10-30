@@ -1,6 +1,13 @@
 import mongoose from "mongoose";
 
-await mongoose.connect("mongodb+srv://krishsinha2406_db_user:tOJfY0r32a3r1ln6@cluster0.xlrygjn.mongodb.net/?appName=Cluster0");
+// Use MONGO_URI from environment for safety. Make sure to set it before running `npm run seed`.
+const uri = process.env.MONGO_URI;
+if (!uri) {
+  console.error("MONGO_URI environment variable is not set. Aborting seed.");
+  process.exit(1);
+}
+
+await mongoose.connect(uri);
 
 const complimentSchema = new mongoose.Schema({ text: String });
 const Compliment = mongoose.model("Compliment", complimentSchema);
