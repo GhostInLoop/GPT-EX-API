@@ -1,33 +1,28 @@
+import express from "express";
 import mongoose from "mongoose";
+import cors from "cors";
 
-let isConnected = false;
+const app = express();
+app.use(cors());
 
-// MongoDB connection
-async function connectDB() {
-  if (isConnected) return;
-  await mongoose.connect(process.env.MONGO_URI);
-  isConnected = true;
-}
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("Mongo error:", err));
 
-// Mongoose model
 const complimentSchema = new mongoose.Schema({ text: String });
-const Compliment = mongoose.models.Compliment || mongoose.model("Compliment", complimentSchema);
+const Compliment = mongoose.model("Compliment", complimentSchema);
 
-// API handler
-export default async function handler(req, res) {
+app.get("/api/compliments/random", async (req, res) => {
   try {
-    await connectDB();
-
     const count = await Compliment.countDocuments();
-    if (count === 0) {
-      return res.json({ text: "You're awesome, even without a database! 🐼" });
-    }
-
     const random = Math.floor(Math.random() * count);
     const compliment = await Compliment.findOne().skip(random);
-    res.status(200).json(compliment);
+    res.json(compliment || { text: "You're awesome!" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: err.message });
   }
-}
+});
+
+// Vercel expects this:
+export default app;
